@@ -1,0 +1,59 @@
+#!/usr/bin/env node
+var prog = require('commander');
+var dfm = require('../lib/dfm.js');
+
+var path = require('path');
+var fs = require('fs');
+var exists = fs.existsSync;
+var utils = require('../lib/utils.js');
+var fatal = utils.fatal;
+var error = utils.error;
+var log = utils.log;
+var warn = utils.warn;
+
+prog
+  .version('0.0.0')
+  .usage('file');
+
+prog.parse(process.argv);
+var args = prog.args;
+
+if (!args[0] && !prog.all) {
+  fatal('Missing file name, if you want to sync all files, use -a flag');
+}
+
+if (!exists(path.join(dfm.home, '.dotfiles'))) {
+  fatal('~/.dotfiles directory is not found, run dfm clone first');
+}
+
+var cmds = [];
+
+args.forEach(function(it) {
+  doAddDotFile(it);
+});
+
+dfm.confirmExec(cmds);
+
+function doAddDotFile(file) {
+  var dotFile = dfm.findDotFileInRepo(file), verb = '';
+  if (exists(file)) {
+    if (dotFile) {
+      verb = 'Update';
+    } else {
+      verb = 'Add';
+    }
+    if (dfm.isDir(file)) {
+      cmds.push('cp -r ' + file + ' ' + path.join(dfm.repoPath, dotFile));
+    } else {
+      cmds.push('cp ' + file + ' ' + path.join(dfm.repoPath, dotFile));
+    }
+    cmds.push('cd ' + dfm.repoPath);
+    cmds.push('git add -A');
+    cmds.push('git commit -m "' + verb + ' ' + file + ' file"');
+  } else {
+    error(file + ' does not exist');
+    process.exit();
+  }
+}
+
+

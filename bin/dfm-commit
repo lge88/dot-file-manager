@@ -1,0 +1,29 @@
+#!/usr/bin/env node
+var dfm = require('../lib/dfm.js');
+var fs = require('fs');
+var exists = require('fs').existsSync;
+var prog = require('commander');
+
+var utils = require('../lib/utils');
+var fatal = utils.fatal;
+var error = utils.error;
+var log = utils.log;
+var warn = utils.warn;
+
+prog
+  .version(dfm.version);
+
+prog.parse(process.argv);
+var args = prog.args;
+var msg = args.join(' ');
+msg === '' && (msg = 'Update dotfiles');
+
+var cmds = [
+  'cd ' + dfm.repoPath,
+  'git add -A',
+  'git commit -m "' + msg + '"'
+];
+
+dfm.confirmExec(cmds);
+
+

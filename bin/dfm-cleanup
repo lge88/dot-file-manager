@@ -1,0 +1,17 @@
+#! /bin/bash
+mkdir -p ~/.backup
+FILES=`find . -maxdepth 1 -name '*.bak'`
+
+if [[ ! -z $FILES ]]; then
+    read -p "mv $FILES to ~/.backup? [yes/no] " ans
+else
+    echo "Abort." && exit
+fi
+
+if [[ $ans == 'yes' ]]; then
+    for f in $FILES; do
+        cp -rL $f ~/.backup
+        rm -rf $f
+    done    
+fi
+

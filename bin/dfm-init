@@ -1,0 +1,74 @@
+#!/usr/bin/env node
+var dfm = require('../lib/dfm.js');
+var prog = require('commander');
+var fs = require('fs');
+var exists = fs.existsSync;
+var isDir = dfm.isDir;
+
+var path = require('path');
+var join = path.join;
+var utils = require('../lib/utils');
+var fatal = utils.fatal;
+var error = utils.error;
+var log = utils.log;
+var warn = utils.warn;
+
+prog
+  .version('0.0.1')
+  .usage('[options]')        
+  .option('-d, --default-list', 'Add default dotfiles to repo');
+
+prog.parse(process.argv);
+var args = prog.args;
+
+var cmds = [
+  'mkdir -p ' + dfm.repoPath 
+];
+
+var defaultList = [
+  '.bash_profile',
+  '.bashrc',
+  '.emacs',
+  '.emacs.bmk',
+  '.emacs.d',
+  '.gitconfig',
+  '.gitignore_global'
+];
+
+if (prog.defaultList) {
+  args = args.concat(defaultList);
+}
+
+if (args.length > 0) {
+  args.forEach(function(it) {
+    if (exists(it)) {
+      var relPath = path.relative(dfm.home, it);
+      if ( !( path.dirname(relPath) === '.' ) ) {
+        cmds.push('mkdir -p ' + join(dfm.repoPath, path.dirname(relPath)));
+      }
+      if (isDir(it)) {
+        cmds.push('cp -r ' + join(dfm.home,  it) + ' ' + join(dfm.repoPath, it));     
+      } else {
+        cmds.push('cp ' + join(dfm.home,  it) + ' ' + join(dfm.repoPath, it));
+      }      
+    }
+  });
+}
+
+cmds.push('cd ' + dfm.repoPath);
+
+if (args.indexOf('.emacs.d') > -1) {
+  ['auto-save-list', 'autosaves', 'backups'].forEach(function(it) {
+    cmds.push('mkdir -p ' + join('.emacs.d', it));
+    cmds.push('rm -fr ' + join('.emacs.d', it, '*'));
+    cmds.push('echo * > ' + join('.emacs.d', it, '.gitignore'));
+    cmds.push('echo !.gitignore >> ' + join('.emacs.d', it, '.gitignore'));
+  });
+}
+
+cmds.push('git init');
+cmds.push('git add -A');
+cmds.push('git commit -m "initial commit"');
+
+dfm.confirmExec(cmds);
+

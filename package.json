@@ -1,0 +1,26 @@
+{
+  "name": "dot-file-manager",
+  "version": "0.0.0",
+  "description": "dotfile manager in node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "dfm": "bin/dfm"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lge88/dotfile-manager.git"
+  },
+  "keywords": [
+    "dotfile",
+    "configure manager"
+  ],
+  "author": "Li Ge",
+  "license": "MIT",
+  "dependencies": {
+    "shelljs": "~0.1.2",
+    "commander": "~1.1.1"
+  }
+}

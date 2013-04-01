@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+var dfm = require('../lib/dfm.js');
+var prog = require('commander');
+var utils = require('../lib/utils');
+var fatal = utils.fatal;
+var error = utils.error;
+var log = utils.log;
+var warn = utils.warn;
+
+prog
+  .version(dfm.version);
+
+prog.parse(process.argv);
+
+var cmds = [
+  'cd ' + dfm.repoPath,
+  'git pull'
+];
+
+dfm.confirmExec(cmds);

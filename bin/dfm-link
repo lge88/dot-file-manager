@@ -1,0 +1,53 @@
+#!/usr/bin/env node
+var dfm = require('../lib/dfm.js');
+var fs = require('fs');
+var exists = require('fs').existsSync;
+var prog = require('commander');
+
+var utils = require('../lib/utils');
+var fatal = utils.fatal;
+var error = utils.error;
+var log = utils.log;
+var warn = utils.warn;
+
+prog
+  .version('0.0.1')
+  .usage('[options] file');
+
+prog.parse(process.argv);
+var args = prog.args;
+
+if (!args[0]) {
+  fatal('Must specify a file to be linked!');
+}
+
+var cmds = [];
+
+args.forEach(function(it) {
+  link(it);
+});
+
+dfm.confirmExec(cmds);
+
+function link(file) {
+  var dotFile;
+  // The file is found in the repo
+  if (( dotFile = dfm.findDotFileInRepo(file)) ) {
+    // If the file already exists, make a backup
+    if (exists(file)) {      
+      var d = new Date();
+      var bakFile = d.toDateString().split(' ');
+      bakFile.push(d.getHours(), d.getMinutes(), d.getSeconds());
+      bakFile = file + '.' + bakFile.join('_') + '.bak';
+      
+      warn('warn', 'File ' + file + ' will be overrided, backup file ' + bakFile + ' will be generated');
+      cmds.push('mv ' + file + ' ' + bakFile);
+    }
+    cmds.push('ln -s ' + dotFile + ' ' + file);
+  } else {
+    error('Can not find dot file ' + file + ' in the repository, use dfm add <file> to add the file into repository');
+  }
+}
+
+
+

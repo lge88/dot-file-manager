@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+var prog = require('commander');
+var fs = require('fs');
+var exists = fs.existsSync;
+
+var dfm = require('../lib/dfm.js');
+var ls = dfm.getDotFileList;
+var repo = dfm.repoPath;
+
+var utils = require('../lib/utils.js');
+var fatal = utils.fatal;
+var error = utils.error;
+var log = utils.log;
+var warn = utils.warn;
+
+prog
+  .version('0.0.0');
+
+prog.parse(process.argv);
+
+if (!exists(repo)) {
+  fatal('repository directory is not found, run dfm clone or dfm init first');
+}
+
+console.log(ls().join('\n'));
+
