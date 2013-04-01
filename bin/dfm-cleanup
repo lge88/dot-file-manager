@@ -1,16 +1,17 @@
 #! /bin/bash
-mkdir -p ~/.backup
+BAK_PATH=~/.backup/`date +%Y_%m_%d`
+mkdir -p $BAK_PATH
 FILES=`find . -maxdepth 1 -name '*.bak'`
 
 if [[ ! -z $FILES ]]; then
-    read -p "mv $FILES to ~/.backup? [yes/no] " ans
+    read -p "mv $FILES to ${BAK_PATH}? [yes/no] " ans
 else
     echo "Abort." && exit
 fi
 
 if [[ $ans == 'yes' ]]; then
     for f in $FILES; do
-        cp -rL $f ~/.backup
+        cp -rL $f ${BAK_PATH}/
         rm -rf $f
     done    
 fi

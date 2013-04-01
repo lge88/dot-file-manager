@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+var prog = require('commander');
+var dfm = require('../lib/dfm.js');
+
+var path = require('path');
+var fs = require('fs');
+var exists = fs.existsSync;
+var utils = require('../lib/utils.js');
+var fatal = utils.fatal;
+var error = utils.error;
+var log = utils.log;
+var warn = utils.warn;
+
+prog
+  .version('0.0.0')
+  .usage('file');
+
+prog.parse(process.argv);
+var args = prog.args;
+
+if (!args[0] && !prog.all) {
+  fatal('Missing repo url');
+}
+
+var cmds = [];
+
+doClone(args[0]);
+
+dfm.confirmExec(cmds);
+
+function doClone(url) {  
+  if (exists(dfm.repoPath)) {
+    var d = new Date();
+    var bakFile = d.toDateString().split(' ');
+    bakFile.push(d.getHours(), d.getMinutes(), d.getSeconds());
+    bakFile = dfm.repoPath + '.' + bakFile.join('_') + '.bak';
+    
+    warn('warn', 'Existing repository ' + dfm.repoPath + ' will be overrided, backup file ' + bakFile + ' will be generated');
+    cmds.push('mv ' + dfm.repoPath + ' ' + bakFile);
+  }
+  cmds.push('git clone ' + url + ' ' + dfm.repoPath);  
+}
+
+

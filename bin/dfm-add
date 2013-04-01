@@ -29,7 +29,7 @@ if (!exists(path.join(dfm.home, '.dotfiles'))) {
 var cmds = [];
 
 args.forEach(function(it) {
-  doAddDotFile(it);
+  doAddDotFile(path.resolve(it));
 });
 
 dfm.confirmExec(cmds);
@@ -37,15 +37,16 @@ dfm.confirmExec(cmds);
 function doAddDotFile(file) {
   var dotFile = dfm.findDotFileInRepo(file), verb = '';
   if (exists(file)) {
-    if (dotFile) {
+    cmds.push('mkdir -p ' + path.dirname(dotFile));
+    if (dotFile) {      
       verb = 'Update';
     } else {
       verb = 'Add';
     }
     if (dfm.isDir(file)) {
-      cmds.push('cp -r ' + file + ' ' + path.join(dfm.repoPath, dotFile));
+      cmds.push('cp -r ' + file + ' ' + dotFile);
     } else {
-      cmds.push('cp ' + file + ' ' + path.join(dfm.repoPath, dotFile));
+      cmds.push('cp ' + file + ' ' + dotFile);
     }
     cmds.push('cd ' + dfm.repoPath);
     cmds.push('git add -A');

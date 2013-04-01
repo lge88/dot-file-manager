@@ -30,9 +30,10 @@ args.forEach(function(it) {
 dfm.confirmExec(cmds);
 
 function link(file) {
-  var dotFile;
+  var dotFile = dfm.findDotFileInRepo(file);
   // The file is found in the repo
-  if (( dotFile = dfm.findDotFileInRepo(file)) ) {
+
+  if (exists(dotFile)) {
     // If the file already exists, make a backup
     if (exists(file)) {      
       var d = new Date();

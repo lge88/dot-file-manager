@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+var dfm = require('../lib/dfm.js');
+var cmds = [
+  'cd ' + dfm.repoPath,
+  'git status'
+];
+dfm.batch(cmds);
