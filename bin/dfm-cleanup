@@ -11,7 +11,11 @@ fi
 
 if [[ $ans == 'yes' ]]; then
     for f in $FILES; do
-        cp -rL $f ${BAK_PATH}/
+        if [[ `uname` == Darwin ]]; then
+            cp -r $f ${BAK_PATH}/
+        else
+            cp -rL $f ${BAK_PATH}/
+        fi
         rm -rf $f
     done    
 fi
